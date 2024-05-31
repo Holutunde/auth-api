@@ -15,16 +15,8 @@ namespace Auth.Services
             _context = context;
         }
 
-        public User Register(RegisterDto registerDto)
+        public User Register(User user)
         {
-            var user = new User
-            {
-                FirstName = registerDto.FirstName,
-                LastName = registerDto.LastName,
-                Email = registerDto.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password)
-            };
-
             _context.Users.Add(user);
             _context.SaveChanges();
 
@@ -51,7 +43,7 @@ namespace Auth.Services
             return _context.Users.SingleOrDefault(u => u.Email == email);
         }
 
-        public IEnumerable<User> GetAllUsers()
+        public ICollection<User> GetAllUsers()
         {
             return _context.Users.ToList();
         }
