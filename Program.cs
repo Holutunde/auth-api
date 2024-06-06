@@ -44,6 +44,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddSingleton(new JwtTokenService(configuration["Key"], issuer));
+// AddTranscient
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo

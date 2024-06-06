@@ -5,14 +5,12 @@ namespace Auth.Interfaces
 {
     public interface IUserService
     {
-        User Register(User user);
-        User Login(LoginDto loginDto);
-        User GetUserById(int id);
-        User GetUserByEmail(string email);
-        ICollection<User> GetAllUsers();
-        void UpdateUser(int id, UserDto userDto);
-        void DeleteUser(int id);
+        Task<User> Register(User user);
+        Task<User> Login(LoginDto loginDto);
+        Task<User> GetUserById(int id);
+        Task<User> GetUserByEmail(string email);
+        Task<ICollection<User>> GetAllUsers();
+        Task UpdateUser(int id, UserDto userDto);
+        Task DeleteUser(int id);
     }
-
 }
-

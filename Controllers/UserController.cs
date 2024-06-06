@@ -2,12 +2,12 @@ using Auth.Dto;
 using Auth.Helpers;
 using Auth.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-
+using System.Threading.Tasks;
 
 namespace Auth.Controllers
 {
     [ApiController]
-    [Route("api/users")]
+    [Route("api/user")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -17,10 +17,10 @@ namespace Auth.Controllers
             _userService = userService;
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetUserById(int id)
+        [HttpGet("details/{id}")]
+        public async Task<IActionResult> GetUserById(int id)
         {
-            var user = _userService.GetUserById(id);
+            var user = await _userService.GetUserById(id);
             if (user == null)
             {
                 return NotFound();
@@ -29,9 +29,9 @@ namespace Auth.Controllers
         }
 
         [HttpGet("email/{email}")]
-        public IActionResult GetUserByEmail(string email)
+        public async Task<IActionResult> GetUserByEmail(string email)
         {
-            var user = _userService.GetUserByEmail(email);
+            var user = await _userService.GetUserByEmail(email);
             if (user == null)
             {
                 return NotFound();
@@ -39,22 +39,22 @@ namespace Auth.Controllers
             return Ok(user);
         }
 
-        [HttpGet]
-        public IActionResult GetAllUsers()
+        [HttpGet("users")]
+        public async Task<IActionResult> GetAllUsers()
         {
-            var users = _userService.GetAllUsers();
+            var users = await _userService.GetAllUsers();
             return Ok(new { users, totalUser = users.Count });
         }
-        
-        [HttpPut("{id}")]
-        public IActionResult UpdateUser(int id, UserDto userDto)
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateUser(int id, UserDto userDto)
         {
             if (!ValidationHelper.IsValidEmail(userDto.Email))
             {
                 return BadRequest("Invalid email format.");
             }
 
-            var user = _userService.GetUserById(id);
+            var user = await _userService.GetUserById(id);
             if (user == null)
             {
                 return NotFound();
@@ -64,16 +64,15 @@ namespace Auth.Controllers
             user.LastName = userDto.LastName;
             user.Email = userDto.Email;
 
-            _userService.UpdateUser(id, userDto);
+            await _userService.UpdateUser(id, userDto);
 
             return Ok(user);
         }
 
-
-        [HttpDelete("{id}")]
-        public IActionResult DeleteUser(int id)
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            _userService.DeleteUser(id);
+            await _userService.DeleteUser(id);
             return Ok("User deleted successfully");
         }
     }

@@ -2,7 +2,9 @@ using Auth.Data;
 using Auth.Dto;
 using Auth.Interfaces;
 using Auth.Models;
-
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Auth.Services
 {
@@ -15,17 +17,16 @@ namespace Auth.Services
             _context = context;
         }
 
-        public User Register(User user)
+        public async Task<User> Register(User user)
         {
-            _context.Users.Add(user);
-            _context.SaveChanges();
-
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
             return user;
         }
 
-        public User Login(LoginDto loginDto)
+        public async Task<User> Login(LoginDto loginDto)
         {
-            var user = _context.Users.SingleOrDefault(u => u.Email == loginDto.Email);
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
             {
                 return null;
@@ -33,41 +34,45 @@ namespace Auth.Services
             return user;
         }
 
-        public User GetUserById(int id)
+        public async Task<User> GetUserById(int id)
         {
-            return _context.Users.Find(id);
+            return await _context.Users.FindAsync(id);
         }
 
-        public User GetUserByEmail(string email)
+        public async Task<User> GetUserByEmail(string email)
         {
-            return _context.Users.SingleOrDefault(u => u.Email == email);
+            return await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
         }
 
-        public ICollection<User> GetAllUsers()
+        public async Task<ICollection<User>> GetAllUsersAsync()
         {
-            return _context.Users.ToList();
+            return await _context.Users.ToListAsync();
         }
 
-        public void UpdateUser(int id, UserDto userDto)
+        public async Task UpdateUser(int id, UserDto userDto)
         {
-            var user = _context.Users.Find(id);
+            var user = await _context.Users.FindAsync(id);
             if (user != null)
             {
                 user.FirstName = userDto.FirstName;
                 user.LastName = userDto.LastName;
                 user.Email = userDto.Email;
 
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
 
-        public void DeleteUser(int id)
+        public async Task<ICollection<User>> GetAllUsers()
         {
-            var user = _context.Users.Find(id);
+            return await Task.Run(() => _context.Users.ToList());
+        }
+        public async Task DeleteUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
             if (user != null)
             {
                 _context.Users.Remove(user);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
     }

@@ -4,13 +4,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-
 namespace Auth.Services
 {
     public class JwtTokenService
     {
         private readonly string _key;
         private readonly string _issuer;
+        private readonly string _audience;
 
         public JwtTokenService(string key, string issuer)
         {
@@ -21,7 +21,7 @@ namespace Auth.Services
         public string GenerateToken(int userId, string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_key);
+            var key = Encoding.UTF8.GetBytes(_key);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]

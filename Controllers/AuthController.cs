@@ -4,7 +4,7 @@ using Auth.Interfaces;
 using Auth.Models;
 using Auth.Services;
 using Microsoft.AspNetCore.Mvc;
-
+using System.Threading.Tasks;
 
 namespace YourNamespace.Controllers
 {
@@ -22,7 +22,7 @@ namespace YourNamespace.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             if (!ValidationHelper.IsValidEmail(registerDto.Email))
             {
@@ -34,12 +34,11 @@ namespace YourNamespace.Controllers
                 return BadRequest("Password must be at least 7 characters long and contain at least one number and one special character.");
             }
 
-            var userExist = _userService.GetUserByEmail(registerDto.Email);
+            var userExist = await _userService.GetUserByEmail(registerDto.Email);
             if (userExist != null)
             {
                 return Conflict("User with the provided email already exists.");
             }
-
 
             var user = new User
             {
@@ -49,16 +48,15 @@ namespace YourNamespace.Controllers
                 Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password)
             };
 
-            _userService.Register(user);
+            await _userService.Register(user);
 
             return CreatedAtRoute(new { id = user.Id }, user);
         }
 
-
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var user = _userService.Login(loginDto);
+            var user = await _userService.Login(loginDto);
             if (user == null)
             {
                 return Unauthorized("Invalid credentials");
